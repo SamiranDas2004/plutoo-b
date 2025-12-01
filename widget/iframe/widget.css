@@ -1,0 +1,232 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    height: 100vh;
+    background: #f2f2f2;
+}
+
+#chat-box {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Message Container */
+.message-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+/* Messages */
+.message {
+    padding: 10px 14px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.user-msg {
+    background: #4f46e5;
+    color: white;
+    margin-left: auto;
+    align-self: flex-end;
+}
+
+.bot-msg {
+    background: white;
+    border: 1px solid #ddd;
+    margin-right: auto;
+    align-self: flex-start;
+    color: #333;
+}
+
+/* Raise Ticket Button */
+.raise-ticket-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+    max-width: fit-content;
+}
+
+.raise-ticket-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+}
+
+.raise-ticket-btn:active {
+    transform: translateY(0);
+}
+
+/* Ticket Form Container */
+.ticket-form-container {
+    width: 100%;
+    margin: 8px 0;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ticket-form {
+    background: white;
+    border: 2px solid #4f46e5;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-form h3 {
+    margin: 0 0 12px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.ticket-form input,
+.ticket-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.ticket-form input:focus,
+.ticket-form textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+.ticket-form textarea {
+    resize: vertical;
+    min-height: 70px;
+}
+
+.ticket-form-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.submit-ticket-btn,
+.cancel-ticket-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.submit-ticket-btn {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    color: white;
+}
+
+.submit-ticket-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
+}
+
+.cancel-ticket-btn {
+    background: #f1f1f1;
+    color: #666;
+}
+
+.cancel-ticket-btn:hover {
+    background: #e0e0e0;
+}
+
+/* Input Area */
+#input-area {
+    padding: 10px;
+    display: flex;
+    gap: 8px;
+    border-top: 1px solid #ccc;
+    background: white;
+}
+
+#chat-input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+#chat-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+#send-btn {
+    padding: 10px 16px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+#send-btn:hover {
+    background: #4338ca;
+}
+
+#send-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* Scrollbar styling */
+#messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#messages::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+#messages::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

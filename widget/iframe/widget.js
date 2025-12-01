@@ -1,0 +1,197 @@
+// Get URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+const botToken = urlParams.get("bot_token");
+const sessionId = urlParams.get("session_id");
+
+const API_URL = "http://localhost:8000/chat/";
+const TICKET_API_URL = "http://localhost:8000/tickets/create";
+
+const messagesDiv = document.getElementById("messages");
+const input = document.getElementById("chat-input");
+const sendBtn = document.getElementById("send-btn");
+
+// Simple message without ticket option
+function addMessage(text, type) {
+    const msg = document.createElement("div");
+    msg.className = "message " + type;
+    msg.textContent = text;
+    messagesDiv.appendChild(msg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Message with ticket button detection
+function addMessageWithTicketOption(text, type) {
+    const msgContainer = document.createElement("div");
+    msgContainer.className = "message-container";
+    
+    const msg = document.createElement("div");
+    msg.className = "message " + type;
+    msg.textContent = text;
+    
+    msgContainer.appendChild(msg);
+    
+    // Check if the response mentions support ticket
+    const lowerText = text.toLowerCase();
+    if (lowerText.includes("support ticket") || 
+        lowerText.includes("raise a ticket") ||
+        lowerText.includes("raise ticket") ||
+        lowerText.includes("create a ticket") ||
+        lowerText.includes("create ticket")) {
+        
+        const ticketBtn = document.createElement("button");
+        ticketBtn.className = "raise-ticket-btn";
+        ticketBtn.textContent = "🎫 Raise Support Ticket";
+        ticketBtn.onclick = () => showTicketForm();
+        
+        msgContainer.appendChild(ticketBtn);
+    }
+    
+    messagesDiv.appendChild(msgContainer);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Show ticket form
+function showTicketForm() {
+    // Remove any existing ticket form
+    const existingForm = document.querySelector(".ticket-form-container");
+    if (existingForm) existingForm.remove();
+    
+    const formContainer = document.createElement("div");
+    formContainer.className = "ticket-form-container";
+    
+    formContainer.innerHTML = `
+        <div class="ticket-form">
+            <h3>🎫 Raise Support Ticket</h3>
+            <input type="text" id="ticket-name" placeholder="Your Name *" required />
+            <input type="email" id="ticket-email" placeholder="Your Email *" required />
+            <input type="tel" id="ticket-phone" placeholder="Phone Number (optional)" />
+            <textarea id="ticket-issue" placeholder="Describe your issue... *" rows="4" required></textarea>
+            <div class="ticket-form-actions">
+                <button class="submit-ticket-btn" onclick="submitTicket()">Submit Ticket</button>
+                <button class="cancel-ticket-btn" onclick="cancelTicket()">Cancel</button>
+            </div>
+        </div>
+    `;
+    
+    messagesDiv.appendChild(formContainer);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
+
+// Submit ticket
+async function submitTicket() {
+    const name = document.getElementById("ticket-name")?.value.trim();
+    const email = document.getElementById("ticket-email")?.value.trim();
+    const phone = document.getElementById("ticket-phone")?.value.trim();
+    const issue = document.getElementById("ticket-issue")?.value.trim();
+    
+    if (!name || !email || !issue) {
+        alert("Please fill in all required fields (Name, Email, and Issue)");
+        return;
+    }
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert("Please enter a valid email address");
+        return;
+    }
+    
+    // Remove the form
+    const formContainer = document.querySelector(".ticket-form-container");
+    if (formContainer) formContainer.remove();
+    
+    // Show loading message
+    addMessage("Submitting your ticket...", "bot-msg");
+    
+    try {
+        const res = await fetch(TICKET_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                bot_token: botToken,
+                session_id: sessionId,
+                name: name,
+                email: email,
+                phone: phone || null,
+                issue: issue
+            })
+        });
+        
+        const data = await res.json();
+        
+        if (res.ok) {
+            addMessage(`✅ Ticket created successfully! Your ticket ID is: ${data.ticket_id}. Our team will contact you soon at ${email}.`, "bot-msg");
+        } else {
+            addMessage("❌ Failed to create ticket. Please try again or contact support directly.", "bot-msg");
+        }
+    } catch (error) {
+        console.error("Error creating ticket:", error);
+        addMessage("❌ An error occurred while creating the ticket. Please try again later.", "bot-msg");
+    }
+}
+
+// Cancel ticket form
+function cancelTicket() {
+    const formContainer = document.querySelector(".ticket-form-container");
+    if (formContainer) formContainer.remove();
+    addMessage("Ticket creation cancelled. How else can I help you?", "bot-msg");
+}
+
+// Send chat message
+async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, "user-msg");
+
+    input.value = "";
+    sendBtn.disabled = true;
+
+    try {
+        const res = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                bot_token: botToken,
+                session_id: sessionId,
+                message: text
+            })
+        });
+
+        if (!res.ok) {
+            throw new Error("Failed to get response from server");
+        }
+
+        const data = await res.json();
+
+        // Use the function that checks for ticket mentions
+        addMessageWithTicketOption(data.reply, "bot-msg");
+
+    } catch (error) {
+        console.error("Error:", error);
+        addMessage("Sorry, something went wrong. Please try again.", "bot-msg");
+    } finally {
+        sendBtn.disabled = false;
+        input.focus();
+    }
+}
+
+// Event listeners
+sendBtn.onclick = sendMessage;
+
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+});
+
+// Make functions globally accessible for inline onclick handlers
+window.submitTicket = submitTicket;
+window.cancelTicket = cancelTicket;
+window.showTicketForm = showTicketForm;
+
+// Log initialization
+console.log("Chat widget initialized");
+console.log("Bot Token:", botToken);
+console.log("Session ID:", sessionId);
