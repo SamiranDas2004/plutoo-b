@@ -4,17 +4,20 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getToken } from '@/lib/auth';
 
-export default function Home() {
+export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
     const token = getToken();
-    if (token) {
-      router.push('/dashboard');
-    } else {
+    if (!token) {
       router.push('/login');
     }
   }, [router]);
 
-  return null;
+  const token = getToken();
+  if (!token) {
+    return null;
+  }
+
+  return <>{children}</>;
 }
