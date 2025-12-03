@@ -8,6 +8,8 @@ from starlette.responses import Response
 import os
 
 
+
+
 class CustomCORSMiddleware(BaseHTTPMiddleware):
     """Custom CORS handling for widget endpoints"""
     
