@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException, Request
+from fastapi import APIRouter, UploadFile, File, Form, Depends, HTTPException
 from sqlalchemy.orm import Session
 from langchain_community.document_loaders import PyMuPDFLoader, TextLoader, Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -7,17 +7,18 @@ from langchain_openai import OpenAIEmbeddings
 from app.db.session import get_db
 from app.utils.auth_middleware import get_current_user
 from app.services.pinecone_client import index
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from app.utils.validators import validate_file_size, validate_file_type, sanitize_filename
 
 router = APIRouter()
-limiter = Limiter(key_func=get_remote_address)
 
 embeddings = OpenAIEmbeddings(
     openai_api_key=os.getenv("OPENROUTER_API_KEY"),
     model="text-embedding-3-large",
     openai_api_base="https://openrouter.ai/api/v1",
 )
+
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+ALLOWED_EXTENSIONS = [".pdf", ".txt", ".docx"]
 
 
 def extract_text_from_file(file: UploadFile, saved_path: str):
@@ -36,9 +37,7 @@ def extract_text_from_file(file: UploadFile, saved_path: str):
 
 
 @router.post("/")
-@limiter.limit("10/minute")
 async def upload_file(
-    request: Request,
     file: UploadFile = File(None),
     text: str = Form(None),
     user=Depends(get_current_user),
@@ -50,39 +49,43 @@ async def upload_file(
     - Raw text upload via form body
     """
     from app.db.models import Document
-    from app.utils.audit_logger import AuditLogger, get_client_ip
-    
-    client_ip = get_client_ip(request)
 
     if not file and not text:
         raise HTTPException(400, "Send either a file or text")
-    
-    # Validate text size
-    if text and len(text) > 5000000:  # 5MB text limit
-        AuditLogger.log_security_event(
-            "OVERSIZED_TEXT_UPLOAD",
-            f"Text upload exceeds limit: {len(text)} bytes",
-            client_ip,
-            user["id"]
-        )
-        raise HTTPException(400, "Text content too large (max 5MB)")
 
     # Extract documents
     if file:
+        # Validate file
+        content = await file.read()
+        file_size = len(content)
+        
+        validate_file_size(file_size, MAX_FILE_SIZE)
+        validate_file_type(file.filename, ALLOWED_EXTENSIONS)
+        
+        # Sanitize filename
+        safe_filename = sanitize_filename(file.filename)
+        
         # Save file
         os.makedirs("temp", exist_ok=True)
-        upload_path = f"temp/{file.filename}"
+        upload_path = f"temp/{safe_filename}"
 
-        content = await file.read()
         with open(upload_path, "wb") as f:
             f.write(content)
 
-        documents = extract_text_from_file(file, upload_path)
-        file_size = len(content)
-        filename = file.filename
-        file_type = file.content_type or "application/octet-stream"
+        try:
+            documents = extract_text_from_file(file, upload_path)
+            filename = safe_filename
+            file_type = file.content_type or "application/octet-stream"
+        finally:
+            # Clean up temp file
+            if os.path.exists(upload_path):
+                os.remove(upload_path)
 
     else:
+        # Validate text size
+        if len(text) > MAX_FILE_SIZE:
+            raise HTTPException(400, "Text content too large")
+        
         # Raw text → convert to LangChain Document
         from langchain_core.documents import Document as LangChainDoc
         documents = [LangChainDoc(page_content=text)]
@@ -134,15 +137,6 @@ async def upload_file(
     db.add(doc)
     db.commit()
     db.refresh(doc)
-    
-    # Log data access
-    AuditLogger.log_data_access(
-        user_id=user["id"],
-        action="CREATE",
-        resource_type="document",
-        resource_id=str(doc.id),
-        ip_address=client_ip
-    )
 
     return {
         "message": "Data stored successfully!",

@@ -1,0 +1,11 @@
+# Pluto AI Customer Support - Robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://pluto.chat/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1

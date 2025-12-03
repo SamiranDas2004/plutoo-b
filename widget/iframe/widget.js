@@ -13,19 +13,84 @@ const sendBtn = document.getElementById("send-btn");
 // Simple message without ticket option
 function addMessage(text, type) {
     const msg = document.createElement("div");
-    msg.className = "message " + type;
+    msg.className = "message " + type + " message-appear";
     msg.textContent = text;
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return msg;
 }
 
-// Message with ticket button detection
+// Add typing indicator
+function addTypingIndicator() {
+    const indicator = document.createElement("div");
+    indicator.className = "typing-indicator";
+    indicator.id = "typing-indicator";
+    indicator.textContent = "AI is typing";
+    messagesDiv.appendChild(indicator);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return indicator;
+}
+
+// Remove typing indicator
+function removeTypingIndicator() {
+    const indicator = document.getElementById("typing-indicator");
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// Stream message character by character
+function streamMessage(text, type, onComplete) {
+    const msgContainer = document.createElement("div");
+    msgContainer.className = "message-container";
+    
+    const msg = document.createElement("div");
+    msg.className = "message " + type + " streaming-msg message-appear";
+    msg.textContent = "";
+    
+    msgContainer.appendChild(msg);
+    messagesDiv.appendChild(msgContainer);
+    
+    let index = 0;
+    const streamInterval = setInterval(() => {
+        if (index < text.length) {
+            msg.textContent += text[index];
+            index++;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        } else {
+            clearInterval(streamInterval);
+            msg.classList.remove("streaming-msg");
+            
+            // Check for ticket option after streaming is complete
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes("support ticket") || 
+                lowerText.includes("raise a ticket") ||
+                lowerText.includes("raise ticket") ||
+                lowerText.includes("create a ticket") ||
+                lowerText.includes("create ticket")) {
+                
+                const ticketBtn = document.createElement("button");
+                ticketBtn.className = "raise-ticket-btn";
+                ticketBtn.textContent = "🎫 Raise Support Ticket";
+                ticketBtn.onclick = () => showTicketForm();
+                
+                msgContainer.appendChild(ticketBtn);
+            }
+            
+            if (onComplete) onComplete();
+        }
+    }, 20); // Adjust speed here (lower = faster)
+    
+    return msgContainer;
+}
+
+// Message with ticket button detection (non-streaming)
 function addMessageWithTicketOption(text, type) {
     const msgContainer = document.createElement("div");
     msgContainer.className = "message-container";
     
     const msg = document.createElement("div");
-    msg.className = "message " + type;
+    msg.className = "message " + type + " message-appear";
     msg.textContent = text;
     
     msgContainer.appendChild(msg);
@@ -120,13 +185,13 @@ async function submitTicket() {
         const data = await res.json();
         
         if (res.ok) {
-            addMessage(`✅ Ticket created successfully! Your ticket ID is: ${data.ticket_id}. Our team will contact you soon at ${email}.`, "bot-msg");
+            streamMessage(`✅ Ticket created successfully! Your ticket ID is: ${data.ticket_id}. Our team will contact you soon at ${email}.`, "bot-msg");
         } else {
-            addMessage("❌ Failed to create ticket. Please try again or contact support directly.", "bot-msg");
+            streamMessage("❌ Failed to create ticket. Please try again or contact support directly.", "bot-msg");
         }
     } catch (error) {
         console.error("Error creating ticket:", error);
-        addMessage("❌ An error occurred while creating the ticket. Please try again later.", "bot-msg");
+        streamMessage("❌ An error occurred while creating the ticket. Please try again later.", "bot-msg");
     }
 }
 
@@ -134,10 +199,10 @@ async function submitTicket() {
 function cancelTicket() {
     const formContainer = document.querySelector(".ticket-form-container");
     if (formContainer) formContainer.remove();
-    addMessage("Ticket creation cancelled. How else can I help you?", "bot-msg");
+    streamMessage("Ticket creation cancelled. How else can I help you?", "bot-msg");
 }
 
-// Send chat message
+// Send chat message with streaming response
 async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -146,6 +211,9 @@ async function sendMessage() {
 
     input.value = "";
     sendBtn.disabled = true;
+
+    // Add typing indicator
+    const typingIndicator = addTypingIndicator();
 
     try {
         const res = await fetch(API_URL, {
@@ -164,13 +232,19 @@ async function sendMessage() {
 
         const data = await res.json();
 
-        // Use the function that checks for ticket mentions
-        addMessageWithTicketOption(data.reply, "bot-msg");
+        // Remove typing indicator
+        removeTypingIndicator();
+
+        // Stream the response
+        streamMessage(data.reply, "bot-msg", () => {
+            sendBtn.disabled = false;
+            input.focus();
+        });
 
     } catch (error) {
         console.error("Error:", error);
+        removeTypingIndicator();
         addMessage("Sorry, something went wrong. Please try again.", "bot-msg");
-    } finally {
         sendBtn.disabled = false;
         input.focus();
     }

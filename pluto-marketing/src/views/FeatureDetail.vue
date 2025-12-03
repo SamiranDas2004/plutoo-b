@@ -74,6 +74,8 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useSeo } from '../composables/useSeo'
+import { routeMeta } from '../utils/seo'
 
 const route = useRoute()
 
@@ -252,6 +254,9 @@ const feature = computed(() => {
   const id = route.params.id
   return features[id] || features['ai-rag']
 })
+
+const metaKey = computed(() => `feature-${route.params.id}`)
+useSeo(computed(() => routeMeta[metaKey.value] || routeMeta['feature-ai-rag']))
 </script>
 
 <style scoped>

@@ -39,14 +39,17 @@ onUnmounted(() => {
 })
 
 const frameworks = [
+  {name:'HTML',logo:'/src/assets/logos_svg/html-5-svgrepo-com.svg'},
   { name: 'React', logo: '/src/assets/logos_svg/react-svgrepo-com.svg' },
   { name: 'Vue.js', logo: '/src/assets/logos_svg/vue-svgrepo-com.svg' },
+  { name:'WordPress',logo:'/src/assets/logos_svg/wordpress-logo-svgrepo-com.svg'},
   { name: 'Angular', logo: '/src/assets/logos_svg/angular-icon-svgrepo-com.svg' },
   { name: 'Svelte', logo: '/src/assets/logos_svg/svelte-svgrepo-com.svg' },
   { name: 'Next.js', logo: '/src/assets/logos_svg/nextjs-icon-svgrepo-com.svg' },
   { name: 'Nuxt.js', logo: '/src/assets/logos_svg/Nuxt JS.svg' },
   { name: 'Laravel', logo: '/src/assets/logos_svg/laravel.svg' },
-  { name: 'Backbone.js', logo: '/src/assets/logos_svg/backbonejs-svgrepo-com.svg' }
+  { name: 'Backbone.js', logo: '/src/assets/logos_svg/backbonejs-svgrepo-com.svg' },
+  
 ]
 </script>
 

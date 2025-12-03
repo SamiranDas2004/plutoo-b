@@ -1,0 +1,18 @@
+# Security Dependencies
+slowapi==0.1.9  # Rate limiting
+python-dotenv==1.0.0  # Environment variables
+passlib[bcrypt]==1.7.4  # Password hashing
+PyJWT==2.8.0  # JWT tokens
+cryptography==41.0.7  # Encryption utilities
+
+# Existing dependencies (add these to your requirements.txt)
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+pydantic
+httpx
+langchain
+langchain-community
+langchain-openai
+pinecone-client

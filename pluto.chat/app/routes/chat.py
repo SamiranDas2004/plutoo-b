@@ -1,13 +1,16 @@
 import os
 import httpx
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from app.db.session import get_db
 from app.db.models import User
 from app.services.pinecone_client import index
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 OPENROUTER_BASE = "https://openrouter.ai/api/v1"
@@ -20,7 +23,34 @@ class ChatRequest(BaseModel):
     bot_token: str
     session_id: str
     message: str
-    visitor_contact: str | None = None  # optional email / phone
+    visitor_contact: str | None = None
+    
+    @validator('bot_token')
+    def validate_bot_token(cls, v):
+        if not v or len(v) < 10 or len(v) > 100:
+            raise ValueError("Invalid bot token format")
+        # Only allow alphanumeric, dash, underscore
+        import re
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError("Bot token contains invalid characters")
+        return v
+    
+    @validator('session_id')
+    def validate_session_id(cls, v):
+        if not v or len(v) > 100:
+            raise ValueError("Invalid session ID")
+        import re
+        if not re.match(r'^[a-zA-Z0-9_-]+$', v):
+            raise ValueError("Session ID contains invalid characters")
+        return v
+    
+    @validator('message')
+    def validate_message(cls, v):
+        if not v or not v.strip():
+            raise ValueError("Message cannot be empty")
+        if len(v) > 5000:
+            raise ValueError("Message too long (max 5000 characters)")
+        return v.strip()
 
 
 # ==========================================================
@@ -161,13 +191,31 @@ async def summarize_conversation(full_messages):
 # MAIN CHAT ENDPOINT
 # ==========================================================
 @router.post("/")
-async def chat(req: ChatRequest, db: Session = Depends(get_db)):
+@limiter.limit("30/minute")
+async def chat(request: Request, req: ChatRequest, db: Session = Depends(get_db)):
     from app.db.models import ChatMessage, ChatSession
+    from app.utils.audit_logger import AuditLogger, get_client_ip
+    
+    client_ip = get_client_ip(request)
 
     # 1️⃣ Validate bot token → find user
     user = db.query(User).filter(User.bot_token == req.bot_token).first()
     if not user:
+        AuditLogger.log_security_event(
+            "INVALID_BOT_TOKEN",
+            f"Invalid bot token attempt: {req.bot_token[:10]}...",
+            client_ip
+        )
         raise HTTPException(status_code=404, detail="Invalid bot token")
+    
+    # Log API access
+    AuditLogger.log_api_access(
+        user_id=user.id,
+        endpoint="/chat",
+        method="POST",
+        ip_address=client_ip,
+        status_code=200
+    )
 
     namespace = user.pinecone_namespace
 

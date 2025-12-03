@@ -1,44 +1,41 @@
 import secrets
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from app.db.session import get_db
 from app.db.models import User
 from app.utils.jwt_handler import create_access_token
-from app.services.pinecone_client import index
 from app.utils.auth_middleware import get_current_user
 from passlib.context import CryptContext
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from app.utils.validators import validate_email, validate_password
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+limiter = Limiter(key_func=get_remote_address)
 
 
 class SignupRequest(BaseModel):
     email: str
     password: str
+    
+    @validator('email')
+    def validate_email_field(cls, v):
+        return validate_email(v)
+    
+    @validator('password')
+    def validate_password_field(cls, v):
+        return validate_password(v)
 
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
-
-
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from app.db.session import get_db
-from app.db.models import User
-from app.utils.jwt_handler import create_access_token
-from passlib.context import CryptContext
-
-router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-class SignupRequest(BaseModel):
-    full_name: str
+class LoginRequest(BaseModel):
     email: str
-    company_name: str
     password: str
+    
+    @validator('email')
+    def validate_email_field(cls, v):
+        return validate_email(v)
 
 
 def hash_password(password: str):
@@ -46,15 +43,18 @@ def hash_password(password: str):
 
 
 @router.post("/signup")
-def signup(body: SignupRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def signup(request: Request, body: SignupRequest, db: Session = Depends(get_db)):
+    from app.utils.audit_logger import AuditLogger, get_client_ip
+    
     email = body.email
     password = body.password
-    full_name = body.full_name
-    company_name = body.company_name
+    client_ip = get_client_ip(request)
 
     # Check if user already exists
     existing = db.query(User).filter(User.email == email).first()
     if existing:
+        AuditLogger.log_auth_attempt(email, False, client_ip, "signup", "Email already registered")
         raise HTTPException(status_code=400, detail="Email already registered")
 
     # Generate bot token for tenant chat identification
@@ -62,9 +62,7 @@ def signup(body: SignupRequest, db: Session = Depends(get_db)):
 
     # Create user record (namespace blank for now)
     user = User(
-        full_name=full_name,
         email=email,
-        company_name=company_name,
         hashed_password=hash_password(password),
         pinecone_namespace="",
         bot_token=bot_token
@@ -78,43 +76,47 @@ def signup(body: SignupRequest, db: Session = Depends(get_db)):
     namespace = str(user.id)
     user.pinecone_namespace = namespace
     db.commit()
+    
+    # Log successful signup
+    AuditLogger.log_auth_attempt(email, True, client_ip, "signup")
 
     return {
         "message": "User created successfully",
         "user": {
             "id": user.id,
-            "full_name": user.full_name,
             "email": user.email,
-            "company_name": user.company_name,
             "namespace": namespace,
             "bot_token": bot_token
         }
     }
 
 
-class LoginRequest(BaseModel):
-    email: str
-    password: str
-
-
 @router.post("/login")
-def login(body: LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(request: Request, body: LoginRequest, db: Session = Depends(get_db)):
+    from app.utils.audit_logger import AuditLogger, get_client_ip
+    
     email = body.email
     password = body.password
+    client_ip = get_client_ip(request)
 
     user = db.query(User).filter(User.email == email).first()
     if not user:
+        AuditLogger.log_auth_attempt(email, False, client_ip, "login", "User not found")
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
     if not pwd_context.verify(password, user.hashed_password):
+        AuditLogger.log_auth_attempt(email, False, client_ip, "login", "Invalid password")
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
     # Generate JWT
     token = create_access_token({
-    "id": str(user.id),
-    "email": user.email
+        "id": str(user.id),
+        "email": user.email
     })
-
+    
+    # Log successful login
+    AuditLogger.log_auth_attempt(email, True, client_ip, "login")
 
     return {
         "message": "Login successful",
@@ -131,6 +133,18 @@ class ProfileUpdateRequest(BaseModel):
     name: str = None
     email: str = None
     password: str = None
+    
+    @validator('email')
+    def validate_email_field(cls, v):
+        if v:
+            return validate_email(v)
+        return v
+    
+    @validator('password')
+    def validate_password_field(cls, v):
+        if v:
+            return validate_password(v)
+        return v
 
 
 @router.put("/profile")

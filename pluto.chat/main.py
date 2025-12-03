@@ -1,6 +1,14 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, status
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.middleware.request_size_limiter import RequestSizeLimiterMiddleware
+from app.middleware.cors_middleware import CustomCORSMiddleware
+import os
 from app.routes.chat import router as chat_router
 from app.routes.upload import router as upload_router
 from app.routes.auth import router as auth_router
@@ -14,19 +22,44 @@ from app.routes.audio import router as audio_router
 from app.routes.website import router as website_router
 from app.routes.tickets import router as tickets_router
 
+# Rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(
     title="My SaaS API",
-    version="1.0.0"
+    version="1.0.0",
+    docs_url=None if os.getenv("ENVIRONMENT") == "production" else "/docs",
+    redoc_url=None if os.getenv("ENVIRONMENT") == "production" else "/redoc"
 )
 
-# Enable CORS for widget
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for testing. In production, specify your domain
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Add security middlewares
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestSizeLimiterMiddleware, max_size=10 * 1024 * 1024)  # 10MB
+app.add_middleware(CustomCORSMiddleware)  # Custom CORS for widget endpoints
+
+# Global exception handler
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": "Invalid request data"},
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    # Log the error (add proper logging)
+    if os.getenv("ENVIRONMENT") == "production":
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": "Internal server error"},
+        )
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={"detail": str(exc)},
+    )
 
 # Register routes
 app.include_router(auth_router, prefix="/auth")
