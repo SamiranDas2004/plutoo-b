@@ -25,6 +25,7 @@ class ChatRequest(BaseModel):
     message: str
     visitor_contact: str | None = None
     
+    
     @validator('bot_token')
     def validate_bot_token(cls, v):
         if not v or len(v) < 10 or len(v) > 100:
