@@ -38,17 +38,28 @@ onUnmounted(() => {
   }
 })
 
+import htmlLogo from '@/assets/logos_svg/html-5-svgrepo-com.svg'
+import reactLogo from '@/assets/logos_svg/react-svgrepo-com.svg'
+import vueLogo from '@/assets/logos_svg/vue-svgrepo-com.svg'
+import wordpressLogo from '@/assets/logos_svg/wordpress-logo-svgrepo-com.svg'
+import angularLogo from '@/assets/logos_svg/angular-icon-svgrepo-com.svg'
+import svelteLogo from '@/assets/logos_svg/svelte-svgrepo-com.svg'
+import nextjsLogo from '@/assets/logos_svg/nextjs-icon-svgrepo-com.svg'
+import nuxtjsLogo from '@/assets/logos_svg/Nuxt JS.svg'
+import laravelLogo from '@/assets/logos_svg/laravel.svg'
+import backboneLogo from '@/assets/logos_svg/backbonejs-svgrepo-com.svg'
+
 const frameworks = [
-  {name:'HTML',logo:'/src/assets/logos_svg/html-5-svgrepo-com.svg'},
-  { name: 'React', logo: '/src/assets/logos_svg/react-svgrepo-com.svg' },
-  { name: 'Vue.js', logo: '/src/assets/logos_svg/vue-svgrepo-com.svg' },
-  { name:'WordPress',logo:'/src/assets/logos_svg/wordpress-logo-svgrepo-com.svg'},
-  { name: 'Angular', logo: '/src/assets/logos_svg/angular-icon-svgrepo-com.svg' },
-  { name: 'Svelte', logo: '/src/assets/logos_svg/svelte-svgrepo-com.svg' },
-  { name: 'Next.js', logo: '/src/assets/logos_svg/nextjs-icon-svgrepo-com.svg' },
-  { name: 'Nuxt.js', logo: '/src/assets/logos_svg/Nuxt JS.svg' },
-  { name: 'Laravel', logo: '/src/assets/logos_svg/laravel.svg' },
-  { name: 'Backbone.js', logo: '/src/assets/logos_svg/backbonejs-svgrepo-com.svg' },
+  {name:'HTML',logo: htmlLogo},
+  { name: 'React', logo: reactLogo },
+  { name: 'Vue.js', logo: vueLogo },
+  { name:'WordPress',logo: wordpressLogo},
+  { name: 'Angular', logo: angularLogo },
+  { name: 'Svelte', logo: svelteLogo },
+  { name: 'Next.js', logo: nextjsLogo },
+  { name: 'Nuxt.js', logo: nuxtjsLogo },
+  { name: 'Laravel', logo: laravelLogo },
+  { name: 'Backbone.js', logo: backboneLogo },
   
 ]
 </script>
