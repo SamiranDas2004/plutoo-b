@@ -212,9 +212,10 @@
 }
 
 .card-2 {
-  top: 50%;
-  right: -5%;
+  top: 30%;
+  right: -20%;
   animation-delay: 1s;
+  z-index: 2;
 }
 
 .card-3 {
@@ -238,6 +239,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   width: 80%;
+  z-index: 1;
 }
 
 .chat-interface {
