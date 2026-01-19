@@ -6,13 +6,7 @@
         <h2 class="section-title">Simple, <span class="gradient-text">Transparent Pricing</span></h2>
         <p class="section-description">Start free, scale as you grow. No hidden fees, cancel anytime.</p>
         
-        <div class="pricing-toggle">
-          <span :class="{ active: !isAnnual }">Monthly</span>
-          <div class="toggle-switch" @click="togglePricing">
-            <div class="toggle-slider" :class="{ annual: isAnnual }"></div>
-          </div>
-          <span :class="{ active: isAnnual }">Annual <span class="discount">Save 20%</span></span>
-        </div>
+       
       </div>
       
       <div class="pricing-grid">
@@ -92,7 +86,7 @@ const plans = [
   },
   {
     name: 'Professional',
-    price: 999,
+    price: 499,
     annualPrice: 950,
     monthlySavings: 20,
     description: 'For growing companies with higher volume',
@@ -112,7 +106,7 @@ const plans = [
   },
   {
     name: 'Enterprise',
-    price: 2999,
+    price: 1499,
     annualPrice: 2870,
     monthlySavings: 60,
     description: 'For large organizations with custom needs',

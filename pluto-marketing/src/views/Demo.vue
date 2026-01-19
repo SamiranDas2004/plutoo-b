@@ -3,7 +3,7 @@
     <div class="demo-container">
       <div class="demo-header">
         <h1>Book a Demo</h1>
-        <p>Schedule a personalized demo with our team to see how Pluto can transform your customer support</p>
+        <p>Schedule a personalized demo with our team to see how Plutoo can transform your customer support</p>
       </div>
 
       <div class="demo-grid">
@@ -74,17 +74,18 @@
 import { useSeo } from '../composables/useSeo'
 
 useSeo({
-  title: 'Book a Demo | Pluto AI Customer Support',
-  description: 'Schedule a personalized demo of Pluto AI customer support platform. See how RAG technology can reduce your support costs by 80%.',
-  keywords: 'Pluto demo, AI support demo, schedule demo, book meeting'
+  title: 'Book a Demo | Plutoo AI Customer Support',
+  description: 'Schedule a personalized demo of Plutoo AI customer support platform. See how RAG technology can reduce your support costs by 80%.',
+  keywords: 'Plutoo demo, AI support demo, schedule demo, book meeting'
 })
 </script>
 
-<style scoped>
+<style scoped>o
 .demo-page {
   min-height: 100vh;
   background: #fafafa;
-  padding-top: 80px;
+  padding-top: 120px;
+  margin-top: 0;
 }
 
 .demo-container {
@@ -115,7 +116,7 @@ useSeo({
 
 .demo-grid {
   display: grid;
-  grid-template-columns: 30% 70%;
+  grid-template-columns: 1fr 2fr;
   gap: 2rem;
   align-items: start;
 }
@@ -215,6 +216,17 @@ useSeo({
   text-decoration: underline;
 }
 
+@media (max-width: 1200px) {
+  .demo-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .calendar-wrapper {
+    order: -1;
+  }
+}
+
 @media (max-width: 968px) {
   .demo-grid {
     grid-template-columns: 1fr;
@@ -226,12 +238,24 @@ useSeo({
 }
 
 @media (max-width: 768px) {
+  .demo-page {
+    padding-top: 100px;
+  }
+  
   .demo-header h1 {
     font-size: 2rem;
+  }
+  
+  .demo-header p {
+    font-size: 1rem;
   }
 
   .calendar-wrapper {
     padding: 1rem;
+  }
+  
+  .calendar-wrapper iframe {
+    height: 500px;
   }
 
   .demo-container {
@@ -239,6 +263,28 @@ useSeo({
   }
 
   .demo-content h2 {
+    font-size: 1.25rem;
+  }
+  
+  .stats {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .demo-header h1 {
+    font-size: 1.75rem;
+  }
+  
+  .calendar-wrapper iframe {
+    height: 450px;
+  }
+  
+  .benefits-list li {
+    gap: 0.5rem;
+  }
+  
+  .icon {
     font-size: 1.25rem;
   }
 }

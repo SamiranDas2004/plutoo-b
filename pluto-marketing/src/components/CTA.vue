@@ -4,7 +4,7 @@
       <div class="cta-content">
         <div class="cta-badge">Get Started Today</div>
         <h2 class="cta-title">Ready to Transform Your Customer Support?</h2>
-        <p class="cta-description">Join 500+ companies using Pluto AI to deliver exceptional customer experiences. Start your free trial today - no credit card required.</p>
+        <p class="cta-description">Join 500+ companies using Plutoo AI to deliver exceptional customer experiences. Start your free trial today - no credit card required.</p>
         
         <div class="cta-features">
           <div class="feature-item">

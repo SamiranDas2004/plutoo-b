@@ -4,8 +4,7 @@
       <div class="footer-content">
         <div class="footer-section footer-brand">
           <div class="footer-logo">
-            <span class="logo-icon">🚀</span>
-            <span class="logo-text">Pluto</span>
+            <img src="../assets/logo.png" alt="Plutoo" class="logo-image" />
           </div>
           <p class="footer-description">
             Transform your customer support with AI-powered solutions that scale with your business. Deliver exceptional experiences 24/7.
@@ -25,7 +24,7 @@
             </a>
           </div>
           <div class="footer-contact">
-            <p><i class="fas fa-envelope"></i> hello@plutoai.com</p>
+            <p><i class="fas fa-envelope"></i> hello@plutoo.chat</p>
             <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
           </div>
         </div>
@@ -60,7 +59,7 @@
       
       <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <p>&copy; 2024 Pluto AI. All rights reserved.</p>
+          <p>&copy; 2024 Plutoo AI. All rights reserved.</p>
           <div class="footer-legal">
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
@@ -127,15 +126,9 @@
   margin-bottom: 1.5rem;
 }
 
-.logo-icon {
-  font-size: 2rem;
-}
-
-.logo-text {
-  background: linear-gradient(135deg, #2ED0E6 0%, #ffffff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.logo-image {
+  height: 40px;
+  width: auto;
 }
 
 .footer-description {

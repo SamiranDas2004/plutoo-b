@@ -90,7 +90,7 @@ onUnmounted(() => {
 
 const testimonials = [
   {
-    text: "Pluto AI has revolutionized our customer support. Response times dropped from hours to seconds, and our customer satisfaction scores increased by 40%. It's like having a team of expert support agents working 24/7.",
+    text: "Plutoo AI has revolutionized our customer support. Response times dropped from hours to seconds, and our customer satisfaction scores increased by 40%. It's like having a team of expert support agents working 24/7.",
     name: "Sarah Chen",
     title: "Head of Customer Success",
     company: "TechFlow Inc.",

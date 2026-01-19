@@ -3,7 +3,7 @@
     <div class="signup-container">
       <div class="signup-box">
         <div class="logo-section">
-          <h1>Pluto</h1>
+          <h1>Plutoo</h1>
           <p>Start your 14-day free trial</p>
         </div>
 
@@ -33,8 +33,8 @@ import { useRouter } from 'vue-router'
 import { useSeo } from '../composables/useSeo'
 
 useSeo({
-  title: 'Start Free Trial | Pluto AI Customer Support',
-  description: 'Start your 14-day free trial of Pluto AI customer support. No credit card required.',
+  title: 'Start Free Trial | Plutoo AI Customer Support',
+  description: 'Start your 14-day free trial of Plutoo AI customer support. No credit card required.',
   keywords: 'free trial, signup, AI customer support'
 })
 

@@ -2,13 +2,15 @@
   <nav class="navbar" :class="{ scrolled: isScrolled }">
     <div class="container">
       <div class="logo">
-        <img :src="logoImage" alt="Pluto" class="logo-image" />
+        <router-link to="/">
+          <img :src="logoImage" alt="Plutoo" class="logo-image" />
+        </router-link>
       </div>
       <ul class="nav-links" :class="{ active: mobileMenuOpen }">
-        <li><a href="#features" @click="closeMobileMenu">Features</a></li>
-        <li><a href="#how-it-works" @click="closeMobileMenu">How It Works</a></li>
-        <li><a href="#pricing" @click="closeMobileMenu">Pricing</a></li>
-        <li><a href="#testimonials" @click="closeMobileMenu">Testimonials</a></li>
+        <li><a @click="scrollToSection('features')">Features</a></li>
+        <li><a @click="scrollToSection('how-it-works')">How It Works</a></li>
+        <li><a @click="scrollToSection('pricing')">Pricing</a></li>
+        <li><a @click="scrollToSection('testimonials')">Testimonials</a></li>
       </ul>
       <div class="nav-actions">
         <button class="btn-secondary" @click="$router.push('/demo')">Demo</button>
@@ -25,7 +27,10 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import logoImage from '../assets/logo.png'
+
+const router = useRouter()
 
 const isScrolled = ref(false)
 const mobileMenuOpen = ref(false)
@@ -40,6 +45,25 @@ const toggleMobileMenu = () => {
 
 const closeMobileMenu = () => {
   mobileMenuOpen.value = false
+}
+
+const scrollToSection = (sectionId) => {
+  closeMobileMenu()
+  
+  // If we're not on the home page, navigate to home first
+  if (router.currentRoute.value.path !== '/') {
+    router.push(`/#${sectionId}`)
+    return
+  }
+  
+  // If we're on home page, scroll to section
+  const element = document.getElementById(sectionId)
+  if (element) {
+    element.scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
 }
 
 onMounted(() => {
@@ -83,6 +107,12 @@ onUnmounted(() => {
   align-items: center;
 }
 
+.logo a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 .logo-image {
   height: 50px;
   width: auto;
@@ -99,6 +129,7 @@ onUnmounted(() => {
   color: #4a5568;
   font-weight: 500;
   transition: color 0.3s;
+  cursor: pointer;
 }
 
 .nav-links a:hover {

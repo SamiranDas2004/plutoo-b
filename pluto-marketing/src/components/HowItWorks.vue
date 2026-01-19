@@ -36,7 +36,7 @@
       <!-- <div class="cta-section">
         <div class="cta-content">
           <h3>Ready to transform your customer support?</h3>
-          <p>Join 500+ companies already using Pluto AI</p>
+          <p>Join 500+ companies already using Plutoo AI</p>
           <button class="cta-button">Start Free Trial</button>
         </div>
       </div> -->

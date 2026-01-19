@@ -5,7 +5,7 @@
         <i class="fas fa-check-circle"></i>
       </div>
 
-      <h1>Welcome to Pluto! 🎉</h1>
+      <h1>Welcome to Plutoo! 🎉</h1>
       <p class="subtitle">Your 14-day free trial has started</p>
 
       <div class="widget-card">
@@ -83,8 +83,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useSeo } from '../composables/useSeo'
 
 useSeo({
-  title: 'Welcome to Pluto | Setup Your AI Chatbot',
-  description: 'Get started with Pluto AI customer support',
+  title: 'Welcome to Plutoo | Setup Your AI Chatbot',
+  description: 'Get started with Plutoo AI customer support',
   keywords: 'setup, widget code, integration'
 })
 
