@@ -59,27 +59,31 @@ const goToStep = (index) => {
   router.push(`/step/${stepIds[index]}`)
 }
 
+import uploadVideo from '@/assets/features_video/upload.mp4'
+import trainingVideo from '@/assets/features_video/training.mp4'
+import deploymentVideo from '@/assets/features_video/deployement.mp4'
+
 const steps = [
   {
     title: 'Upload Your Content',
     description: 'Import your existing knowledge base, documents, PDFs, or website content. Our AI automatically processes and indexes everything.',
     features: ['Drag & drop interface', 'Multiple file formats', 'Bulk upload support'],
     time: '2 minutes',
-    video: './src/assets/features_video/upload.mp4'
+    video: uploadVideo
   },
   {
     title: 'Customize & Train',
     description: 'Personalize the AI with your brand colors, tone, and specific responses. The system learns from your content automatically.',
     features: ['Brand customization', 'Tone adjustment', 'Auto-training'],
     time: '5 minutes',
-    video: './src/assets/features_video/training.mp4'
+    video: trainingVideo
   },
   {
     title: 'Deploy & Scale',
     description: 'Add our widget to your website with a single line of code, or integrate via our robust API. Start helping customers instantly.',
     features: ['One-click deployment', 'API integration', 'Real-time analytics'],
     time: '1 minute',
-    video: './src/assets/features_video/deployement.mp4'
+    video: deploymentVideo
   }
 ]
 </script>
