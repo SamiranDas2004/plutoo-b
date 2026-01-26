@@ -50,14 +50,7 @@
         </div>
       </div>
       
-      <div class="partners-section">
-        <h3>Trusted by leading companies</h3>
-        <div class="partners-logos">
-          <div class="partner-logo" v-for="(partner, index) in partners" :key="index">
-            <img :src="partner.logo" :alt="partner.name" />
-          </div>
-        </div>
-      </div>
+     
     </div>
   </section>
 </template>
