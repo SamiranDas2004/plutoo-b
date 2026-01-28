@@ -9,6 +9,9 @@ from app.services.pinecone_client import index
 from app.utils.auth_middleware import get_current_user
 from passlib.context import CryptContext
 
+
+
+
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
