@@ -12,6 +12,13 @@ class User(Base):
     pinecone_namespace = Column(String(255), unique=True, nullable=False)
     bot_token = Column(String(255), unique=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Widget customization columns
+    widget_primary_color = Column(String(7), default="#007bff")
+    widget_text_color = Column(String(7), default="#ffffff")
+    widget_font_family = Column(String(100), default="Arial, sans-serif")
+    widget_position = Column(String(20), default="bottom-right")
+    widget_welcome_message = Column(String(500), default="Hi! How can I help you today?")
 
 
 class ChatSession(Base):

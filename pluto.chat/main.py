@@ -9,6 +9,10 @@ from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.request_size_limiter import RequestSizeLimiterMiddleware
 from app.middleware.cors_middleware import CustomCORSMiddleware
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 from app.routes.chat import router as chat_router
 from app.routes.upload import router as upload_router
 from app.routes.auth import router as auth_router
@@ -75,11 +79,15 @@ app.include_router(audio_router, prefix="/audio")
 app.include_router(website_router, prefix="/website")
 app.include_router(tickets_router, prefix="/tickets")
 
-# Mount static files for widget (only if directory exists)
+# Mount static files
 import os
 widget_dir = "../widget"
 if os.path.exists(widget_dir):
     app.mount("/widget", StaticFiles(directory=widget_dir, html=True), name="widget")
+
+static_dir = "static"
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir, html=True), name="static")
 
 @app.get("/")
 def root():

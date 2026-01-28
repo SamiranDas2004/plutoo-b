@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize Widget - Pluto Chat</title>
+    <link rel="stylesheet" href="/static/css/customize.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Customize Your Chat Widget</h1>
+            <p>Personalize the appearance of your chat widget</p>
+        </div>
+
+        <div class="content">
+            <div class="form-section">
+                <h2>Widget Settings</h2>
+                
+                <div class="form-group">
+                    <label for="primaryColor">Primary Color (Button & Header)</label>
+                    <div class="color-input-group">
+                        <input type="color" id="primaryColor" value="#007bff">
+                        <input type="text" id="primaryColorText" value="#007bff" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="textColor">Text Color (Header Text)</label>
+                    <div class="color-input-group">
+                        <input type="color" id="textColor" value="#ffffff">
+                        <input type="text" id="textColorText" value="#ffffff" readonly>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fontFamily">Font Family</label>
+                    <select id="fontFamily">
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="Helvetica, sans-serif">Helvetica</option>
+                        <option value="'Times New Roman', serif">Times New Roman</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="'Courier New', monospace">Courier New</option>
+                        <option value="Verdana, sans-serif">Verdana</option>
+                        <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+                        <option value="'Comic Sans MS', cursive">Comic Sans MS</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="position">Widget Position</label>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="position" value="bottom-right" checked>
+                            Bottom Right
+                        </label>
+                        <label>
+                            <input type="radio" name="position" value="bottom-left">
+                            Bottom Left
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="welcomeMessage">Welcome Message</label>
+                    <textarea id="welcomeMessage" rows="3" maxlength="500" placeholder="Hi! How can I help you today?"></textarea>
+                    <small id="charCount">0 / 500 characters</small>
+                </div>
+
+                <button id="saveBtn" class="save-btn">Save Changes</button>
+                <div id="message" class="message"></div>
+            </div>
+
+            <div class="preview-section">
+                <h2>Live Preview</h2>
+                <div id="preview-container">
+                    <div id="preview-widget" class="widget-preview">
+                        <button id="preview-button" class="preview-chat-button">💬</button>
+                        <div id="preview-window" class="preview-chat-window" style="display: none;">
+                            <div id="preview-header" class="preview-header">
+                                <span>Chat with us</span>
+                                <button class="preview-close">×</button>
+                            </div>
+                            <div class="preview-messages">
+                                <div class="preview-bot-message" id="preview-welcome">Hi! How can I help you today?</div>
+                            </div>
+                            <div class="preview-input-area">
+                                <input type="text" placeholder="Type a message..." disabled>
+                                <button disabled>Send</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/customize.js"></script>
+</body>
+</html>

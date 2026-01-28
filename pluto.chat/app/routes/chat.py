@@ -87,12 +87,14 @@ async def should_use_pinecone(query: str) -> bool:
         ]
     }
 
-    async with httpx.AsyncClient() as client:
-        res = await client.post(url, headers=headers, json=payload)
-        data = res.json()
-
-    ans = data["choices"][0]["message"]["content"].strip().upper()
-    return ans == "YES"
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            res = await client.post(url, headers=headers, json=payload)
+            data = res.json()
+        ans = data["choices"][0]["message"]["content"].strip().upper()
+        return ans == "YES"
+    except:
+        return False
 
 
 # ==========================================================
@@ -154,11 +156,13 @@ async def create_chat_response(context: str, query: str, used_rag: bool):
         ]
     }
 
-    async with httpx.AsyncClient() as client:
-        res = await client.post(url, headers=headers, json=payload)
-        data = res.json()
-
-    return data["choices"][0]["message"]["content"]
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            res = await client.post(url, headers=headers, json=payload)
+            data = res.json()
+        return data["choices"][0]["message"]["content"]
+    except:
+        return "I'm having trouble connecting right now. Please try again in a moment."
 
 
 # ==========================================================
@@ -181,11 +185,13 @@ async def summarize_conversation(full_messages):
         ]
     }
 
-    async with httpx.AsyncClient() as client:
-        res = await client.post(url, headers=headers, json=payload)
-        data = res.json()
-
-    return data["choices"][0]["message"]["content"]
+    try:
+        async with httpx.AsyncClient(timeout=20.0) as client:
+            res = await client.post(url, headers=headers, json=payload)
+            data = res.json()
+        return data["choices"][0]["message"]["content"]
+    except:
+        return ""  # Return empty string on timeout instead of crashing
 
 
 # ==========================================================
@@ -238,7 +244,7 @@ async def chat(request: Request, req: ChatRequest, db: Session = Depends(get_db)
     db.add(visitor_msg)
     db.commit()
 
-    # 4️⃣ Auto-summarize if total messages > 20
+    # 4️⃣ Auto-summarize if total messages > 20 (with timeout handling)
     total_msgs = db.query(ChatMessage).filter(ChatMessage.session_id == req.session_id).count()
 
     if total_msgs > 20:
@@ -249,8 +255,9 @@ async def chat(request: Request, req: ChatRequest, db: Session = Depends(get_db)
             .all()
         )
         summary = await summarize_conversation(full_history)
-        session.summary = summary
-        db.commit()
+        if summary:  # Only update if summarization succeeded
+            session.summary = summary
+            db.commit()
 
     # 5️⃣ Get last 10 messages for short-term memory
     history = (
