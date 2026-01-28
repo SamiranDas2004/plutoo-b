@@ -27,8 +27,7 @@ class ChatSession(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, nullable=False)
     session_id = Column(String(100), index=True, nullable=False)
-    summary = Column(Text, nullable=True)   # ADD THIS
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    summary = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
