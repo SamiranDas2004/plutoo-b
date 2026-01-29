@@ -23,7 +23,7 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
         
         # Allow all origins for widget/chat endpoints (customer websites)
-        if request.url.path.startswith("/widget") or request.url.path.startswith("/chat"):
+        if request.url.path.startswith("/widget") or request.url.path.startswith("/chat") or request.url.path.startswith("/auth"):
             response.headers["Access-Control-Allow-Origin"] = origin or "*"
             response.headers["Access-Control-Allow-Credentials"] = "true"
         else:
