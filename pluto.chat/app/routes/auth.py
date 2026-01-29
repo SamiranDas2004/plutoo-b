@@ -1,4 +1,5 @@
 import secrets
+import bcrypt
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -7,34 +8,9 @@ from app.db.models import User
 from app.utils.jwt_handler import create_access_token
 from app.services.pinecone_client import index
 from app.utils.auth_middleware import get_current_user
-from passlib.context import CryptContext
-
-
 
 
 router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-
-class SignupRequest(BaseModel):
-    email: str
-    password: str
-
-
-def hash_password(password: str):
-    return pwd_context.hash(password)
-
-
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from app.db.session import get_db
-from app.db.models import User
-from app.utils.jwt_handler import create_access_token
-from passlib.context import CryptContext
-
-router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class SignupRequest(BaseModel):
@@ -44,8 +20,14 @@ class SignupRequest(BaseModel):
     password: str
 
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
+def hash_password(password: str) -> str:
+    """Hash password using bcrypt directly"""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verify password using bcrypt directly"""
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
 @router.post("/signup")
@@ -109,7 +91,7 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
-    if not pwd_context.verify(password, user.hashed_password):
+    if not verify_password(password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid email or password")
 
     # Generate JWT
