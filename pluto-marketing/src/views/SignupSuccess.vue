@@ -13,7 +13,7 @@
         <p>Copy and paste this code before the closing <code>&lt;/body&gt;</code> tag on your website:</p>
         
         <div class="code-block">
-          <pre><code>&lt;script src="http://127.0.0.1:8000/widget/widget-iframe.js"
+          <pre><code>&lt;script src="https://backend.plutoo.chat/widget/widget-iframe.js"
     data-bot-token="{{ botToken }}"&gt;
 &lt;/script&gt;</code></pre>
           <button @click="copyCode" class="copy-btn">
@@ -98,7 +98,7 @@ onMounted(() => {
 })
 
 const widgetCode = computed(() => {
-  return `<script src="http://127.0.0.1:8000/widget/widget-iframe.js"
+  return `<script src="https://backend.plutoo.chat/widget/widget-iframe.js"
     data-bot-token="${botToken.value}">
 <\/script>`
 })
