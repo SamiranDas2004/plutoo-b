@@ -11,7 +11,9 @@ from app.middleware.cors_middleware import CustomCORSMiddleware
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+
+
+# Load environment variables's
 load_dotenv()
 from app.routes.chat import router as chat_router
 from app.routes.upload import router as upload_router
