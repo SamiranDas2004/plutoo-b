@@ -14,7 +14,7 @@
       </ul>
       <div class="nav-actions">
         <button class="btn-secondary" @click="$router.push('/demo')">Demo</button>
-        <button class="btn-primary" @click="$router.push('/signup')">Start 14 Days Free Trial</button>
+        <button class="btn-primary" @click="$router.push('/signup')">Start Free Trial</button>
       </div>
       <button class="mobile-toggle" @click="toggleMobileMenu">
         <span></span>

@@ -25,7 +25,7 @@
           </div>
           <div class="footer-contact">
             <p><i class="fas fa-envelope"></i> hello@plutoo.chat</p>
-            <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+            <p><i class="fas fa-phone"></i> +91 8927750287</p>
           </div>
         </div>
         
@@ -61,9 +61,9 @@
         <div class="footer-bottom-left">
           <p>&copy; 2024 Plutoo AI. All rights reserved.</p>
           <div class="footer-legal">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Cookie Policy</a>
+            <router-link to="/privacy">Privacy Policy</router-link>
+            <router-link to="/terms">Terms of Service</router-link>
+            <router-link to="/refund">Refund Policy</router-link>
             <a href="#">GDPR</a>
           </div>
         </div>

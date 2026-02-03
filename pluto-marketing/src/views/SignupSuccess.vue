@@ -118,7 +118,7 @@ const copyCode = () => {
 }
 
 const goToDashboard = () => {
-  window.open('http://localhost:3000', '_blank')
+  window.open('https://dashboard.plutoo.chat/', '_blank')
 }
 
 const viewDocs = () => {

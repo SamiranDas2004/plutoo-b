@@ -5,6 +5,9 @@ import StepDetail from '../views/StepDetail.vue'
 import Demo from '../views/Demo.vue'
 import Signup from '../views/Signup.vue'
 import SignupSuccess from '../views/SignupSuccess.vue'
+import Terms from '../views/Terms.vue'
+import Privacy from '../views/Privacy.vue'
+import Refund from '../views/Refund.vue'
 import { updateMetaTags, routeMeta } from '../utils/seo'
 
 const routes = [
@@ -61,6 +64,33 @@ const routes = [
     meta: {
       title: 'How It Works | Pluto AI Customer Support',
       description: 'Learn how to get started with Pluto AI customer support platform'
+    }
+  },
+  {
+    path: '/terms',
+    name: 'Terms',
+    component: Terms,
+    meta: {
+      title: 'Terms of Service | Pluto AI',
+      description: 'Terms of Service for Pluto AI customer support platform'
+    }
+  },
+  {
+    path: '/privacy',
+    name: 'Privacy',
+    component: Privacy,
+    meta: {
+      title: 'Privacy Policy | Pluto AI',
+      description: 'Privacy Policy - How we protect your data'
+    }
+  },
+  {
+    path: '/refund',
+    name: 'Refund',
+    component: Refund,
+    meta: {
+      title: 'Refund Policy | Pluto AI',
+      description: 'Refund and cancellation policy'
     }
   }
 ]

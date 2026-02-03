@@ -7,6 +7,7 @@
           <p>Start your 14-day free trial</p>
         </div>
 
+        
         <form @submit.prevent="handleSignup" class="signup-form">
           <input v-model="form.full_name" type="text" placeholder="Full name" required />
           <input v-model="form.email" type="email" placeholder="Work email" required />
