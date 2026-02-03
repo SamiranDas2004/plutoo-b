@@ -13,6 +13,8 @@ from dotenv import load_dotenv
 
 
 
+
+
 # Load environment variables's
 load_dotenv()
 from app.routes.chat import router as chat_router
