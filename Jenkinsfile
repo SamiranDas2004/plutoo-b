@@ -9,7 +9,7 @@ pipeline {
                     // and single quotes for the remote SSH commands.
                     sh '''
                     ssh -o StrictHostKeyChecking=no root@72.61.169.230 '
-                        cd /root/plutoo/plutoo-b/backend &&
+                        cd /root/plutoo/plutoo-b/pluto.chat &&
                         git fetch origin &&
                         git checkout master &&
                         git pull origin master &&
