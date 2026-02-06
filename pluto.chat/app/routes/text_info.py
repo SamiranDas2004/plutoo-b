@@ -138,17 +138,18 @@ def delete_text_info(
     if not text:
         raise HTTPException(404, "Text information not found")
     
-    # Delete from Pinecone
     try:
+        # Delete vectors from Pinecone
         index.delete(
             filter={"source": {"$eq": text.title}, "type": {"$eq": "text_info"}},
             namespace=str(user["id"])
         )
-    except:
-        pass
-    
-    # Delete from database
-    db.delete(text)
-    db.commit()
-    
-    return {"message": "Text information deleted successfully"}
+        
+        # Delete from database
+        db.delete(text)
+        db.commit()
+        
+        return {"message": "Text information deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, f"Delete failed: {str(e)}")

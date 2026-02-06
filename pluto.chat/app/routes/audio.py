@@ -186,7 +186,18 @@ async def delete_audio(
     if not audio:
         raise HTTPException(404, "Audio not found")
     
-    db.delete(audio)
-    db.commit()
-    
-    return {"message": "Audio deleted successfully"}
+    try:
+        # Delete vectors from Pinecone
+        index.delete(
+            filter={"source": {"$eq": audio.filename}, "type": {"$eq": "audio"}},
+            namespace=str(user["id"])
+        )
+        
+        # Delete from database
+        db.delete(audio)
+        db.commit()
+        
+        return {"message": "Audio deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, f"Delete failed: {str(e)}")

@@ -140,9 +140,20 @@ async def delete_website(
     if not website:
         raise HTTPException(404, "Website not found")
     
-    db.delete(website)
-    db.commit()
-    
-    return {"message": "Website deleted successfully"}
+    try:
+        # Delete vectors from Pinecone
+        index.delete(
+            filter={"source": {"$eq": website.url}, "type": {"$eq": "website"}},
+            namespace=str(user["id"])
+        )
+        
+        # Delete from database
+        db.delete(website)
+        db.commit()
+        
+        return {"message": "Website deleted successfully"}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(500, f"Delete failed: {str(e)}")
 
 

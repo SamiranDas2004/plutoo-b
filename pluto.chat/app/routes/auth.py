@@ -1,6 +1,8 @@
 import secrets
 import bcrypt
-from fastapi import APIRouter, Depends, HTTPException
+import os
+import logging
+from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from app.db.session import get_db
@@ -8,6 +10,8 @@ from app.db.models import User
 from app.utils.jwt_handler import create_access_token
 from app.services.pinecone_client import index
 from app.utils.auth_middleware import get_current_user
+
+logger = logging.getLogger(__name__)
 
 
 router = APIRouter()
@@ -83,7 +87,7 @@ class LoginRequest(BaseModel):
 
 
 @router.post("/login")
-def login(body: LoginRequest, db: Session = Depends(get_db)):
+def login(body: LoginRequest, response: Response, db: Session = Depends(get_db)):
     email = body.email
     password = body.password
 
@@ -96,14 +100,25 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 
     # Generate JWT
     token = create_access_token({
-    "id": str(user.id),
-    "email": user.email
+        "id": str(user.id),
+        "email": user.email
     })
-
+    
+    # Set httpOnly cookie
+    is_production = os.getenv("ENVIRONMENT") == "production"
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=is_production,
+        samesite="lax",
+        max_age=86400,
+        path="/",
+        domain=None
+    )
 
     return {
         "message": "Login successful",
-        "token": token,
         "user": {
             "id": user.id,
             "email": user.email,
@@ -156,6 +171,12 @@ def update_profile(
 
 
 @router.post("/logout")
-def logout():
-    """Logout endpoint (client-side token removal)"""
+def logout(response: Response):
+    """Logout endpoint - clears the httpOnly cookie"""
+    is_production = os.getenv("ENVIRONMENT") == "production"
+    response.delete_cookie(
+        key="access_token",
+        path="/",
+        domain=None
+    )
     return {"message": "Logged out successfully"}

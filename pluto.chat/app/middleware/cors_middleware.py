@@ -23,19 +23,21 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
         
         # Allow all origins for widget/chat endpoints (customer websites)
-        if request.url.path.startswith("/widget") or request.url.path.startswith("/chat") or request.url.path.startswith("/auth"):
+        if request.url.path.startswith("/widget") or request.url.path.startswith("/chat"):
             response.headers["Access-Control-Allow-Origin"] = origin or "*"
             response.headers["Access-Control-Allow-Credentials"] = "true"
         else:
-            # Restricted origins for admin/auth endpoints
+            # Restricted origins for dashboard/auth endpoints
             allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-            if origin in allowed_origins:
-                response.headers["Access-Control-Allow-Origin"] = origin
-                response.headers["Access-Control-Allow-Credentials"] = "true"
+            # Allow requests without origin (proxy/same-origin)
+            if not origin or origin in allowed_origins:
+                if origin:
+                    response.headers["Access-Control-Allow-Origin"] = origin
+                    response.headers["Access-Control-Allow-Credentials"] = "true"
         
         # Common CORS headers
         response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Cookie"
         response.headers["Access-Control-Max-Age"] = "3600"
         
         return response
