@@ -13,6 +13,11 @@ class User(Base):
     bot_token = Column(String(255), unique=True, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
+    # Payment and subscription
+    user_type = Column(String(20), default="free")  # free, paid, premium
+    payment_id = Column(String(255), nullable=True)
+    order_id = Column(String(255), nullable=True)
+    
     # Widget customization columns
     widget_primary_color = Column(String(7), default="#007bff")
     widget_text_color = Column(String(7), default="#ffffff")

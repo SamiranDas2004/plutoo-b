@@ -43,3 +43,7 @@ aiosmtplib==3.0.1
 # Text Processing
 beautifulsoup4==4.12.3
 lxml==5.1.0
+
+# Payment
+razorpay==1.4.1
+setuptools>=65.0.0

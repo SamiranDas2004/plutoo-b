@@ -31,6 +31,7 @@ from app.routes.text_info import router as text_info_router
 from app.routes.audio import router as audio_router
 from app.routes.website import router as website_router
 from app.routes.tickets import router as tickets_router
+from app.routes.payment import router as payment_router
 
 # Rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -84,6 +85,7 @@ app.include_router(text_info_router, prefix="/text-info")
 app.include_router(audio_router, prefix="/audio")
 app.include_router(website_router, prefix="/website")
 app.include_router(tickets_router, prefix="/tickets")
+app.include_router(payment_router, prefix="/payment")
 
 # Mount static files
 import os
