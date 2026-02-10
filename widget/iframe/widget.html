@@ -190,6 +190,8 @@ function addMessageWithTicketOption(text, type) {
     
     // Check if response suggests raising a ticket
     const lowerText = text.toLowerCase();
+    console.log("Checking message:", lowerText);
+    
     if (lowerText.includes("raise a support ticket") || 
         lowerText.includes("raise a ticket") ||
         lowerText.includes("create a ticket") ||
@@ -198,6 +200,7 @@ function addMessageWithTicketOption(text, type) {
         lowerText.includes("our team can help") ||
         lowerText.includes("click the button below")) {
         
+        console.log("Ticket button should appear!");
         const ticketBtn = document.createElement("button");
         ticketBtn.className = "raise-ticket-btn";
         ticketBtn.textContent = "🎫 Raise Support Ticket";
