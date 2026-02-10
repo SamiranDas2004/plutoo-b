@@ -5,6 +5,7 @@
     <Features />
     <HowItWorks />
     <Pricing />
+    <TestUs />
     <Testimonials />
     <CTA />
   </div>
@@ -16,6 +17,7 @@ import Compatible from '../components/Compatible.vue'
 import Features from '../components/Features.vue'
 import HowItWorks from '../components/HowItWorks.vue'
 import Pricing from '../components/Pricing.vue'
+import TestUs from '../components/TestUs.vue'
 import Testimonials from '../components/Testimonials.vue'
 import CTA from '../components/CTA.vue'
 import { useSeo } from '../composables/useSeo'

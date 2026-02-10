@@ -5,8 +5,6 @@
         <div class="badge">Pricing</div>
         <h2 class="section-title">Simple, <span class="gradient-text">Transparent Pricing</span></h2>
         <p class="section-description">Start free, scale as you grow. No hidden fees, cancel anytime.</p>
-        
-       
       </div>
       
       <div class="pricing-grid">
@@ -17,11 +15,8 @@
             <h3 class="plan-name">{{ plan.name }}</h3>
             <div class="plan-price">
               <span class="currency">₹</span>
-              <span class="amount">{{ isAnnual ? plan.annualPrice : plan.price }}</span>
-              <span class="period">/{{ isAnnual ? 'year' : 'month' }}</span>
-            </div>
-            <div class="price-note" v-if="isAnnual && plan.monthlySavings">
-              Save ${{ plan.monthlySavings }}/month
+              <span class="amount">{{ plan.price }}</span>
+              <span class="period">/month</span>
             </div>
             <p class="plan-description">{{ plan.description }}</p>
           </div>
@@ -37,40 +32,59 @@
           </div>
           
           <div class="plan-footer">
-            <button class="plan-button" :class="{ primary: plan.featured }">
-              {{ plan.buttonText }}
+            <button 
+              class="plan-button" 
+              :class="{ primary: plan.featured }"
+              @click="handlePlanSelect(plan)"
+              :disabled="loading"
+            >
+              {{ loading ? 'Processing...' : plan.buttonText }}
             </button>
             <p class="trial-note" v-if="plan.trial">{{ plan.trial }}</p>
           </div>
         </div>
       </div>
-      
-      <!-- <div class="enterprise-section">
-        <div class="enterprise-content">
-          <h3>Need something custom?</h3>
-          <p>Enterprise solutions with dedicated support, custom integrations, and SLA guarantees.</p>
-          <button class="enterprise-button">Contact Sales</button>
-        </div>
-      </div> -->
+    </div>
+
+    <!-- Payment Modal -->
+    <div v-if="showPaymentModal" class="modal-overlay" @click="closeModal">
+      <div class="modal-content" @click.stop>
+        <button class="close-btn" @click="closeModal">✕</button>
+        <h3>Complete Your Purchase</h3>
+        <p class="modal-plan">{{ selectedPlan?.name }} Plan - ₹{{ selectedPlan?.price }}/month</p>
+        
+        <form @submit.prevent="processPayment" class="payment-form">
+          <input v-model="paymentForm.email" type="email" placeholder="Your Email *" required />
+          <p class="info-text">Enter the email you used to create your account</p>
+          
+          <button type="submit" class="pay-btn" :disabled="loading">
+            {{ loading ? 'Processing...' : `Pay ₹${selectedPlan?.price}` }}
+          </button>
+        </form>
+        
+        <p class="secure-note">🔒 Secure payment powered by Razorpay</p>
+        <p class="account-note">Don't have an account? <a href="/signup">Create one first</a></p>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
-const isAnnual = ref(false)
-
-const togglePricing = () => {
-  isAnnual.value = !isAnnual.value
-}
+const router = useRouter()
+const loading = ref(false)
+const showPaymentModal = ref(false)
+const selectedPlan = ref(null)
+const paymentForm = ref({
+  email: ''
+})
 
 const plans = [
   {
     name: 'Starter',
     price: 0,
-    annualPrice: 0,
-    monthlySavings: 0,
     description: 'Perfect for small businesses getting started',
     features: [
       '1,000 AI responses/month',
@@ -87,8 +101,6 @@ const plans = [
   {
     name: 'Professional',
     price: 499,
-    annualPrice: 950,
-    monthlySavings: 20,
     description: 'For growing companies with higher volume',
     features: [
       '10,000 AI responses/month',
@@ -101,14 +113,12 @@ const plans = [
       'Advanced integrations'
     ],
     buttonText: 'Start Free Trial',
-    trial: '14-day free trial',
+    trial: '',
     featured: true
   },
   {
     name: 'Enterprise',
     price: 1499,
-    annualPrice: 2870,
-    monthlySavings: 60,
     description: 'For large organizations with custom needs',
     features: [
       'Unlimited AI responses',
@@ -123,10 +133,112 @@ const plans = [
       'On-premise deployment option'
     ],
     buttonText: 'Contact Sales',
-    trial: 'Custom trial available',
+    trial: '',
     featured: false
   }
 ]
+
+const handlePlanSelect = (plan) => {
+  if (plan.price === 0) {
+    router.push('/signup')
+  } else if (plan.name === 'Enterprise') {
+    window.location.href = 'mailto:sales@plutoo.chat'
+  } else {
+    selectedPlan.value = plan
+    showPaymentModal.value = true
+  }
+}
+
+const closeModal = () => {
+  showPaymentModal.value = false
+  selectedPlan.value = null
+}
+
+const processPayment = async () => {
+  loading.value = true
+  
+  try {
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://backend.plutoo.chat'
+    
+    const orderRes = await fetch(`${BACKEND_URL}/payment/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: selectedPlan.value.price * 100,
+        plan_name: selectedPlan.value.name,
+        email: paymentForm.value.email
+      })
+    })
+    
+    if (!orderRes.ok) {
+      const errorData = await orderRes.json()
+      alert(errorData.detail || 'Failed to create order')
+      loading.value = false
+      return
+    }
+    
+    const orderData = await orderRes.json()
+    
+    const script = document.createElement('script')
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+    script.async = true
+    document.body.appendChild(script)
+    
+    script.onload = () => {
+      const options = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        order_id: orderData.order_id,
+        name: 'Plutoo AI',
+        description: `${selectedPlan.value.name} Plan`,
+        handler: async function (response) {
+          const verifyRes = await fetch(`${BACKEND_URL}/payment/verify-payment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              plan_name: selectedPlan.value.name,
+              email: paymentForm.value.email
+            })
+          })
+          
+          const verifyData = await verifyRes.json()
+          
+          if (verifyRes.ok) {
+            alert('Payment successful! Your account has been upgraded.')
+            window.location.href = 'https://dashboard.plutoo.chat'
+          } else {
+            alert('Payment verification failed: ' + verifyData.detail)
+          }
+          
+          loading.value = false
+          closeModal()
+        },
+        prefill: {
+          email: paymentForm.value.email
+        },
+        theme: {
+          color: '#2ED0E6'
+        },
+        modal: {
+          ondismiss: function() {
+            loading.value = false
+          }
+        }
+      }
+      
+      const rzp = new window.Razorpay(options)
+      rzp.open()
+    }
+  } catch (error) {
+    console.error('Payment error:', error)
+    alert('Payment failed. Please try again.')
+    loading.value = false
+  }
+}
 </script>
 
 <style scoped>
@@ -177,59 +289,6 @@ const plans = [
   font-size: 1.2rem;
   color: #64748b;
   margin-bottom: 2rem;
-}
-
-.pricing-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.pricing-toggle span {
-  font-weight: 600;
-  color: #64748b;
-  transition: color 0.3s;
-}
-
-.pricing-toggle span.active {
-  color: #1e293b;
-}
-
-.discount {
-  background: #dcfce7;
-  color: #059669;
-  padding: 0.2rem 0.5rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  margin-left: 0.5rem;
-}
-
-.toggle-switch {
-  width: 50px;
-  height: 26px;
-  background: #e2e8f0;
-  border-radius: 13px;
-  position: relative;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.toggle-slider {
-  width: 22px;
-  height: 22px;
-  background: white;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  transition: transform 0.3s;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-slider.annual {
-  transform: translateX(24px);
 }
 
 .pricing-grid {
@@ -319,13 +378,6 @@ const plans = [
   color: #64748b;
 }
 
-.price-note {
-  color: #059669;
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
-}
-
 .plan-description {
   color: #64748b;
   line-height: 1.5;
@@ -389,6 +441,11 @@ const plans = [
   color: #2ED0E6;
 }
 
+.plan-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .plan-button.primary {
   background: linear-gradient(135deg, #2C3E50 0%, #2ED0E6 100%);
   color: white;
@@ -407,46 +464,122 @@ const plans = [
   margin: 0;
 }
 
-.enterprise-section {
-  margin-top: 4rem;
-  text-align: center;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  padding: 3rem;
-  border-radius: 20px;
-  border: 1px solid #e2e8f0;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
 }
 
-.enterprise-content h3 {
-  font-size: 1.8rem;
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.modal-content h3 {
+  font-size: 1.5rem;
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 0.5rem;
 }
 
-.enterprise-content p {
+.modal-plan {
   color: #64748b;
-  font-size: 1.1rem;
-  margin-bottom: 2rem;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-bottom: 1.5rem;
 }
 
-.enterprise-button {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.payment-form input {
+  padding: 0.875rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.payment-form input:focus {
+  outline: none;
+  border-color: #2ED0E6;
+  box-shadow: 0 0 0 3px rgba(46, 208, 230, 0.1);
+}
+
+.pay-btn {
+  padding: 1rem;
+  background: linear-gradient(135deg, #2C3E50 0%, #2ED0E6 100%);
   color: white;
-  padding: 1rem 2rem;
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
+  border-radius: 8px;
   font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s;
 }
 
-.enterprise-button:hover {
+.pay-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(30, 41, 59, 0.3);
+  box-shadow: 0 10px 25px rgba(46, 208, 230, 0.3);
+}
+
+.pay-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secure-note {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.account-note {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.account-note a {
+  color: #2ED0E6;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.account-note a:hover {
+  text-decoration: underline;
+}
+
+.info-text {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 @media (max-width: 768px) {
@@ -460,11 +593,6 @@ const plans = [
 
   .pricing-card.featured {
     transform: scale(1);
-  }
-
-  .pricing-toggle {
-    flex-direction: column;
-    gap: 0.5rem;
   }
 }
 </style>

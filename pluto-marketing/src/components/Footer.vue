@@ -10,16 +10,14 @@
             Transform your customer support with AI-powered solutions that scale with your business. Deliver exceptional experiences 24/7.
           </p>
           <div class="social-links">
-            <a href="#" class="social-link" aria-label="Twitter">
+            <a href="https://x.com/SamiranDas2004" class="social-link" aria-label="Twitter">
               <i class="fab fa-twitter"></i>
             </a>
-            <a href="#" class="social-link" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/samiran-das-dev/" class="social-link" aria-label="LinkedIn">
               <i class="fab fa-linkedin-in"></i>
             </a>
-            <a href="#" class="social-link" aria-label="Facebook">
-              <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="#" class="social-link" aria-label="Email">
+           
+            <a href="mailto:hello@plutoo.chat" class="social-link" aria-label="Email">
               <i class="fas fa-envelope"></i>
             </a>
           </div>
@@ -34,21 +32,16 @@
           <ul class="footer-links">
             <li><a href="#features">Features</a></li>
             <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#">API Documentation</a></li>
-            <li><a href="#">Integrations</a></li>
-            <li><a href="#">Changelog</a></li>
-            <li><a href="#">Roadmap</a></li>
+            <li><router-link to="/documentation">Documentation</router-link></li>
+            <li><router-link to="/documentation">Integrations</router-link></li>
           </ul>
         </div>
         
         <div class="footer-section">
           <h4 class="footer-title">Solutions</h4>
           <ul class="footer-links">
-            <li><a href="#">Customer Support</a></li>
-            <li><a href="#">Sales Automation</a></li>
-            <li><a href="#">Knowledge Management</a></li>
-            <li><a href="#">Analytics & Insights</a></li>
-            <li><a href="#">Enterprise</a></li>
+            <li><router-link to="/knowledge-management">Knowledge Management</router-link></li>
+            <li><router-link to="/analytics-insights">Analytics & Insights</router-link></li>
           </ul>
         </div>
         
@@ -59,7 +52,8 @@
       
       <div class="footer-bottom">
         <div class="footer-bottom-left">
-          <p>&copy; 2024 Plutoo AI. All rights reserved.</p>
+          <p>&copy; 2026 Plutoo AI. All rights reserved. product by <a  class="no-decoration" href="http://42vectors.com/">42Vectors</a>
+ </p>
           <div class="footer-legal">
             <router-link to="/privacy">Privacy Policy</router-link>
             <router-link to="/terms">Terms of Service</router-link>
@@ -112,7 +106,11 @@
   gap: 3rem;
   margin-bottom: 3rem;
 }
-
+.no-decoration {
+  text-decoration: none;
+  color: inherit;
+  font-weight: bold;
+  }
 .footer-brand {
   max-width: 350px;
 }

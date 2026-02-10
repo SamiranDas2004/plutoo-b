@@ -8,6 +8,9 @@ import SignupSuccess from '../views/SignupSuccess.vue'
 import Terms from '../views/Terms.vue'
 import Privacy from '../views/Privacy.vue'
 import Refund from '../views/Refund.vue'
+import Documentation from '../views/Documentation.vue'
+import KnowledgeManagement from '../views/KnowledgeManagement.vue'
+import AnalyticsInsights from '../views/AnalyticsInsights.vue'
 import { updateMetaTags, routeMeta } from '../utils/seo'
 
 const routes = [
@@ -91,6 +94,33 @@ const routes = [
     meta: {
       title: 'Refund Policy | Pluto AI',
       description: 'Refund and cancellation policy'
+    }
+  },
+  {
+    path: '/documentation',
+    name: 'Documentation',
+    component: Documentation,
+    meta: {
+      title: 'API Documentation | Pluto AI',
+      description: 'Complete API documentation and integration guides for Pluto AI'
+    }
+  },
+  {
+    path: '/knowledge-management',
+    name: 'KnowledgeManagement',
+    component: KnowledgeManagement,
+    meta: {
+      title: 'Knowledge Management | Pluto AI',
+      description: 'Centralize and manage your company knowledge with AI'
+    }
+  },
+  {
+    path: '/analytics-insights',
+    name: 'AnalyticsInsights',
+    component: AnalyticsInsights,
+    meta: {
+      title: 'Analytics & Insights | Pluto AI',
+      description: 'Track performance and gain insights from your chatbot analytics'
     }
   }
 ]

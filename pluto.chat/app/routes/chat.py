@@ -125,46 +125,81 @@ async def create_chat_response(context: str, query: str, used_rag: bool):
         system_prompt = (
             "You are a helpful AI assistant for a SaaS chatbot platform.\n"
             "The user has asked a question that requires specific information from the knowledge base.\n\n"
-            "IMPORTANT RULES:\n"
-            "1. If the provided context contains relevant information, answer using that information\n"
-            "2. If the context does NOT contain enough details to answer the question accurately, "
-            "respond with: 'I don't have enough information to answer this. Would you like me to raise a support ticket?'\n"
-            "3. Do NOT make up or guess information that isn't in the context\n"
-            "4. You can combine the context information with conversation history to give helpful answers"
+            "CRITICAL RULES - Follow these strictly:\n\n"
+            "1. FIRST, carefully check if the provided context contains relevant information to answer the question\n\n"
+            "2. IF the context IS relevant and sufficient:\n"
+            "   - Answer the question clearly using the context\n"
+            "   - You may combine context with conversation history\n"
+            "   - Cite specific details from the context when helpful\n\n"
+            "3. IF the context is NOT relevant OR lacks necessary details:\n"
+            "   - Do NOT attempt to answer from general knowledge\n"
+            "   - Do NOT make assumptions or guesses\n"
+            "   - Respond EXACTLY with: 'I don't have enough information in our knowledge base to answer this accurately. Would you like me to raise a support ticket so our team can help you?'\n\n"
+            "4. IF the context is partially relevant but incomplete:\n"
+            "   - Share what you DO know from the context\n"
+            "   - Then say: 'For complete details on this, I'd recommend raising a support ticket. Would you like me to do that?'\n\n"
+            "5. NEVER fabricate information, dates, policies, features, or details not present in the context"
         )
     else:
         system_prompt = (
             "You are a friendly and helpful AI assistant for a SaaS chatbot platform.\n"
-            "The user's message doesn't require searching the knowledge base - it's a general conversation.\n\n"
-            "IMPORTANT RULES:\n"
-            "1. For greetings, respond naturally and warmly\n"
-            "2. For general questions, use your knowledge to provide helpful answers\n"
-            "3. For casual conversation, be friendly and engaging\n"
-            "4. If the user asks something specific about the company's products, policies, or services, "
-            "let them know you'd be happy to look that up for them\n"
-            "5. Keep responses concise and natural"
+            "The user's message is general conversation that doesn't require searching the knowledge base.\n\n"
+            "IMPORTANT RULES:\n\n"
+            "1. For greetings (hi, hello, how are you): Respond warmly and ask how you can help\n\n"
+            "2. For general questions (what's the weather, tell me a joke): Use your general knowledge appropriately\n\n"
+            "3. For casual conversation: Be friendly, natural, and engaging\n\n"
+            "4. IF the user asks about specific company information (products, pricing, policies, account details, technical issues):\n"
+            "   - Say: 'That's a great question about [topic]. Let me search our knowledge base for the most accurate information.'\n"
+            "   - Note: The system will then trigger a knowledge base search\n\n"
+            "5. Keep responses concise (2-3 sentences for simple queries)\n\n"
+            "6. Always be helpful and guide users toward the right solution"
         )
+
+    # Improved message structure
+    if used_rag:
+        user_message = (
+            f"CONTEXT FROM KNOWLEDGE BASE:\n"
+            f"---\n"
+            f"{context if context.strip() else 'No relevant context found'}\n"
+            f"---\n\n"
+            f"USER QUESTION: {query}\n\n"
+            f"Remember: Only answer if the context above contains the information. "
+            f"If not, suggest raising a support ticket."
+        )
+    else:
+        user_message = query
 
     payload = {
         "model": "gpt-4o-mini",
         "messages": [
             {"role": "system", "content": system_prompt},
-            {
-                "role": "user",
-                "content": f"Context:\n{context}\n\nUser Query: {query}"
-            }
-        ]
+            {"role": "user", "content": user_message}
+        ],
+        "temperature": 0.3,  # Lower temperature for more consistent responses
+        "max_tokens": 500,   # Reasonable limit for chatbot responses
     }
 
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             res = await client.post(url, headers=headers, json=payload)
+            res.raise_for_status()  # Raise exception for bad status codes
             data = res.json()
-        return data["choices"][0]["message"]["content"]
-    except:
+        
+        response = data["choices"][0]["message"]["content"]
+        
+        # Validation: Check if model is hallucinating when it should suggest ticket
+        if used_rag and context.strip() == "":
+            # No context provided but RAG was used - force ticket suggestion
+            return "I don't have enough information in our knowledge base to answer this accurately. Would you like me to raise a support ticket so our team can help you?"
+        
+        return response
+        
+    except httpx.TimeoutException:
+        return "I'm taking longer than expected to respond. Please try again in a moment."
+    except httpx.HTTPStatusError as e:
+        return f"I'm experiencing technical difficulties (Error {e.response.status_code}). Please try again shortly."
+    except Exception:
         return "I'm having trouble connecting right now. Please try again in a moment."
-
-
 # ==========================================================
 # AUTO SUMMARY GENERATION
 # ==========================================================

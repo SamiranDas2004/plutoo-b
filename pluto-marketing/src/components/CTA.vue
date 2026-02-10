@@ -40,8 +40,8 @@
         </div> -->
         
         <div class="cta-actions">
-          <button class="btn-primary-large">Start Free Trial</button>
-          <button class="btn-secondary-large">Schedule a Demo</button>
+          <button class="btn-primary-large" @click="$router.push('/signup')">Start Free Trial</button>
+          <button class="btn-secondary-large" @click="$router.push('/demo')">Schedule a Demo</button>
         </div>
         
         <div class="cta-note">
