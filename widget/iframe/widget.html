@@ -188,13 +188,15 @@ function addMessageWithTicketOption(text, type) {
     
     msgContainer.appendChild(msg);
     
-    // Check if response mentions support ticket
+    // Check if response suggests raising a ticket
     const lowerText = text.toLowerCase();
-    if (lowerText.includes("support ticket") || 
+    if (lowerText.includes("raise a support ticket") || 
         lowerText.includes("raise a ticket") ||
-        lowerText.includes("raise ticket") ||
         lowerText.includes("create a ticket") ||
-        lowerText.includes("create ticket")) {
+        lowerText.includes("support ticket") ||
+        lowerText.includes("contact our team") ||
+        lowerText.includes("our team can help") ||
+        lowerText.includes("click the button below")) {
         
         const ticketBtn = document.createElement("button");
         ticketBtn.className = "raise-ticket-btn";

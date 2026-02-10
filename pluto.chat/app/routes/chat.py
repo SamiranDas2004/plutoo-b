@@ -79,7 +79,8 @@ async def should_use_pinecone(query: str) -> bool:
                     "- A greeting (hi, hello, hey)\n"
                     "- General conversation or chit-chat\n"
                     "- A question the AI can answer from general knowledge\n"
-                    "- Math, coding, or common sense questions\n\n"
+                    "- Math, coding, or common sense questions\n"
+                    "- A direct request to raise/create a support ticket\n\n"
                     "Respond with only YES or NO."
                 )
             },
@@ -148,11 +149,14 @@ async def create_chat_response(context: str, query: str, used_rag: bool):
             "1. For greetings (hi, hello, how are you): Respond warmly and ask how you can help\n\n"
             "2. For general questions (what's the weather, tell me a joke): Use your general knowledge appropriately\n\n"
             "3. For casual conversation: Be friendly, natural, and engaging\n\n"
-            "4. IF the user asks about specific company information (products, pricing, policies, account details, technical issues):\n"
+            "4. IF the user explicitly asks to 'raise a ticket', 'create a ticket', 'open a ticket', or 'submit a ticket':\n"
+            "   - Respond EXACTLY: 'I'd be happy to help you raise a support ticket. Please click the button below to get started.'\n"
+            "   - DO NOT ask what the ticket is about - the form will collect that\n\n"
+            "5. IF the user asks about specific company information (products, pricing, policies, account details, technical issues):\n"
             "   - Say: 'That's a great question about [topic]. Let me search our knowledge base for the most accurate information.'\n"
             "   - Note: The system will then trigger a knowledge base search\n\n"
-            "5. Keep responses concise (2-3 sentences for simple queries)\n\n"
-            "6. Always be helpful and guide users toward the right solution"
+            "6. Keep responses concise (2-3 sentences for simple queries)\n\n"
+            "7. Always be helpful and guide users toward the right solution"
         )
 
     # Improved message structure
