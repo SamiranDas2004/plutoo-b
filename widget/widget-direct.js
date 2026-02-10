@@ -11,8 +11,8 @@
         localStorage.setItem("plutochat_session_id", sessionId);
     }
 
-    const API_URL = "http://localhost:8000/chat/";
-    const CONFIG_URL = "http://localhost:8000/widget/config/" + BOT_TOKEN;
+    const API_URL = "https://backend.plutoo.chat/chat/";
+    const CONFIG_URL = "https://backend.plutoo.chat/widget/config/" + BOT_TOKEN;
     let isSending = false;
     let config = {
         primaryColor: "#4f46e5",
@@ -22,6 +22,9 @@
         welcomeMessage: "Hi! How can I help you today?"
     };
 
+
+
+    
     // Fetch widget configuration
     async function loadConfig() {
         try {
