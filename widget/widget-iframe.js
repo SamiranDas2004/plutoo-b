@@ -12,6 +12,9 @@
         localStorage.setItem("plutochat_session_id", sessionId);
     }
 
+    const scriptSrc = document.currentScript.src;
+    const BASE_URL = scriptSrc ? new URL(scriptSrc).origin : window.location.origin;
+
     const bubble = document.createElement("div");
     bubble.id = "plutochat-bubble";
     bubble.style.cssText = `
@@ -37,7 +40,7 @@
 
     const iframe = document.createElement("iframe");
     iframe.id = "plutochat-iframe";
-    iframe.src = `https://backend.plutoo.chat/widget/iframe/widget.html?bot_token=${BOT_TOKEN}&session_id=${sessionId}`;
+    iframe.src = `${BASE_URL}/widget/iframe/widget.html?bot_token=${BOT_TOKEN}&session_id=${sessionId}`;
     iframe.style.cssText = `
         position: fixed;
         bottom: 100px;
