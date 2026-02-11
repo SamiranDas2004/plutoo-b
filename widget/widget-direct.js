@@ -131,15 +131,33 @@
 
         function showTicketForm() {
             const formHTML = `
-                <div style="background: white; padding: 16px; border-radius: 12px; border: 2px solid #4f46e5; margin: 12px 0;">
-                    <h3 style="margin: 0 0 12px 0; color: #1e293b; font-size: 16px;">🎫 Raise Support Ticket</h3>
-                    <input type="text" id="ticket-name" placeholder="Your Name *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" />
-                    <input type="email" id="ticket-email" placeholder="Your Email *" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" />
-                    <input type="tel" id="ticket-phone" placeholder="Phone (optional)" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box;" />
-                    <textarea id="ticket-issue" placeholder="Describe your issue... *" rows="4" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 6px; resize: vertical; box-sizing: border-box;"></textarea>
-                    <div style="display: flex; gap: 8px;">
-                        <button id="submit-ticket-btn" style="flex: 1; padding: 10px; background: #4f46e5; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Submit</button>
-                        <button id="cancel-ticket-btn" style="flex: 1; padding: 10px; background: #e5e7eb; color: #374151; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Cancel</button>
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); padding: 20px; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); margin: 12px 0; border: 1px solid #e2e8f0;">
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e2e8f0;">
+                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #4f46e5 0%, #2ED0E6 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">🎫</div>
+                        <div>
+                            <h3 style="margin: 0; color: #1e293b; font-size: 17px; font-weight: 700;">Create Support Ticket</h3>
+                            <p style="margin: 2px 0 0 0; color: #64748b; font-size: 12px;">We'll get back to you within 24 hours</p>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; color: #475569; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Full Name <span style="color: #ef4444;">*</span></label>
+                        <input type="text" id="ticket-name" placeholder="John Doe" style="width: 100%; padding: 11px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';" />
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; color: #475569; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Email Address <span style="color: #ef4444;">*</span></label>
+                        <input type="email" id="ticket-email" placeholder="john@example.com" style="width: 100%; padding: 11px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';" />
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; color: #475569; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Phone Number <span style="color: #94a3b8; font-weight: 400;">(Optional)</span></label>
+                        <input type="tel" id="ticket-phone" placeholder="+1 (555) 000-0000" style="width: 100%; padding: 11px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 14px; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';" />
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; color: #475569; font-size: 13px; font-weight: 600; margin-bottom: 6px;">Issue Description <span style="color: #ef4444;">*</span></label>
+                        <textarea id="ticket-issue" placeholder="Please describe your issue in detail..." rows="4" style="width: 100%; padding: 11px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px; resize: vertical; box-sizing: border-box; font-size: 14px; font-family: inherit; transition: all 0.2s; outline: none;" onfocus="this.style.borderColor='#4f46e5'; this.style.boxShadow='0 0 0 3px rgba(79,70,229,0.1)';" onblur="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="submit-ticket-btn" style="flex: 1; padding: 12px; background: linear-gradient(135deg, #4f46e5 0%, #2ED0E6 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 8px rgba(79,70,229,0.3);" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(79,70,229,0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(79,70,229,0.3)';">Submit Ticket</button>
+                        <button id="cancel-ticket-btn" style="flex: 1; padding: 12px; background: #f1f5f9; color: #475569; border: 1.5px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';">Cancel</button>
                     </div>
                 </div>
             `;
